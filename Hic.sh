@@ -4,12 +4,12 @@
 ### Whole procedure
 ### ---------------
 
-# 1. Fastqc+MultiQC: check the quality of sequencing (required);
-# 2. Trimgalore: filter and trim the reads and cut the adapter (required);
-# 3. Fastqc+MultiQC: check again(required);
-# 4. bwa: align the reads to genome (required);
-# 5. HiCExplorer: post-process bam files (required);
-# 6. FitHic: identify interactions (required);
+# 1. Fastqc+MultiQC: check the quality of sequencing);
+# 2. Trimgalore: filter and trim the reads and cut the adapter;
+# 3. Fastqc+MultiQC: check again;
+# 4. bwa: align the reads to genome;
+# 5. HiCExplorer: post-process bam files);
+# 6. FitHic: identify interactions;
 
 ### -------------
 ### Help document
@@ -38,7 +38,7 @@ Help()
 ### Running command
 ### ---------------
 
-# nohup bash HICv1.sh -c HICv1c.conf &
+# nohup bash Hic.sh -c Hic.conf &
 
 ### --------------
 ### Parse augments
@@ -432,31 +432,6 @@ ls ${wd}/results/hicexplorer/convformat/correct | grep "cool$" > ${wd}/metadata/
 TransMx ${wd}/results/hicexplorer/matrix/correct ${wd}/metadata/correct_ICE_matrix.txt \
         ${wd}/results/hicexplorer/transform/correct ${wd}/logs/hicexplorer/transform/correct obs_exp
 ls ${wd}/results/hicexplorer/transform/correct | grep "cool$" > ${wd}/metadata/correct_ICE_matrix_obs_exp.txt
-
-# 5.6 Identify TAD
-FindTAD ${wd}/results/hicexplorer/matrix/correct ${wd}/metadata/correct_ICE_matrix.txt ${wd}/results/hicexplorer/tad ${wd}/logs/hicexplorer/tad
-
-# 5.7 A/B compartment analysis
-ABcomp ${wd}/results/hicexplorer/matrix/correct ${wd}/metadata/correct_ICE_matrix.txt ${wd}/results/hicexplorer/abs ${wd}/logs/hicexplorer/abs
-
-# 5.8 Plotting matrix
-hicPlotTADs --tracks plotTAD.ini --region chr19:56200000-58640000 -o hic_loop_zscan4_plot.png
-
-# 5.9 Plotting aggregate
-for bedpe in bedpe
-do
-    enhancer=./results/enhancer_${bedpe}.bed
-    cut -f 1-3 ${!bedpe} > ${enhancer}
-    gene=./results/gene_${bedpe}.bed
-    cut -f 4-6 ${!bedpe} > ${gene}
-    hicAggregateContacts --matrix ./results/hicexplorer/matrix/correct/8cell_rep1_f1_bam_merge_nsort_8cell_rep1_r2_bam_merge_nsort_40kbnor_ICE.h5 \
-                         --BED ${enhancer} --BED2 ${gene} --outFileContactPairs test_tmp \
-                         --outFileName 8c_rep1_aggregate_Contacts_${bedpe}_0p5to1p5.pdf --vMin 0.5 --vMax 1.5 \
-                         --range 1000:20000000 --numberOfBins 100 \
-                         --chromosomes chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chr20 chr21 chr22 \
-                         --avgType mean --transform obs/exp --howToCluster center --colorMap bwr 
-    rm ${enhancer} ${gene}
-done
 echo "Finish at $(date)"
 
 
